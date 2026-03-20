@@ -919,19 +919,10 @@ footer{background:#080608;padding:52px 56px;border-top:1px solid rgba(201,169,11
 </style>
 
 <script>
-/* === CURSOR === */
-var cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
-document.addEventListener('mousemove',function(e){
-  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
-  setTimeout(function(){ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},60);
-});
+const cur=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+document.addEventListener('mousemove',function(e){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';setTimeout(function(){ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px';},60);});
+window.addEventListener('scroll',function(){document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>40);});
 
-/* === NAV SCROLL === */
-window.addEventListener('scroll',function(){
-  document.getElementById('mainNav').classList.toggle('scrolled',window.scrollY>40);
-});
-
-/* === SECTION SWITCHING === */
 function showSection(id){
   document.querySelectorAll('section').forEach(function(s){s.classList.remove('active');});
   document.getElementById(id).classList.add('active');
@@ -943,16 +934,9 @@ function showSection(id){
   return false;
 }
 
-/* === SCROLL REVEAL === */
-function checkReveal(){
-  document.querySelectorAll('.reveal').forEach(function(el){
-    if(el.getBoundingClientRect().top<window.innerHeight-50)el.classList.add('visible');
-  });
-}
-window.addEventListener('scroll',checkReveal);
-setTimeout(checkReveal,350);
+function checkReveal(){document.querySelectorAll('.reveal').forEach(function(el){if(el.getBoundingClientRect().top<window.innerHeight-50)el.classList.add('visible');});}
+window.addEventListener('scroll',checkReveal);setTimeout(checkReveal,350);
 
-/* === STORE FILTERS === */
 function filterCat(link,cat){
   document.querySelectorAll('.store-cats a').forEach(function(a){a.classList.remove('ac');});
   link.classList.add('ac');
@@ -965,12 +949,8 @@ function filterCat(link,cat){
   document.getElementById('showCount').textContent=c;
 }
 
-function ss(btn){
-  btn.closest('.p-sizes').querySelectorAll('.p-sbtn').forEach(function(b){b.classList.remove('ss');});
-  btn.classList.add('ss');
-}
+function ss(btn){btn.closest('.p-sizes').querySelectorAll('.p-sbtn').forEach(function(b){b.classList.remove('ss');});btn.classList.add('ss');}
 
-/* === CART === */
 var cc=0;
 function addToCart(btn){
   cc++;
@@ -983,26 +963,15 @@ function addToCart(btn){
   setTimeout(function(){btn.textContent=orig;btn.style.background='';},2200);
 }
 
-/* === WISHLIST === */
 function toggleWish(btn){
-  var on=btn.innerHTML.indexOf('9829')>-1||btn.textContent==='♥';
+  var on=btn.innerHTML==='&#9829;'||btn.textContent==='\u2665';
   btn.innerHTML=on?'&#9825;':'&#9829;';
   btn.style.color=on?'':'var(--rose)';
   if(!on)showToast('Lista de deseos','Guardado correctamente');
 }
 
-/* === PAGINATION === */
-function pgSel(btn){
-  document.querySelectorAll('.pg-btn').forEach(function(b){b.classList.remove('ap');});
-  btn.classList.add('ap');
-}
+function pgSel(btn){document.querySelectorAll('.pg-btn').forEach(function(b){b.classList.remove('ap');});btn.classList.add('ap');}
 
-/* === PACK CHIPS === */
-document.querySelectorAll('.pack-chip').forEach(function(c){
-  c.addEventListener('click',function(){this.classList.toggle('acp');});
-});
-
-/* === TOAST === */
 var tT;
 function showToast(title,msg){
   var t=document.getElementById('toast');
@@ -1013,20 +982,18 @@ function showToast(title,msg){
   tT=setTimeout(function(){t.classList.remove('show');},3200);
 }
 
-/* ============================
-   CANDIDATAS FORM - 3 STEPS
-============================ */
+document.querySelectorAll('.pack-chip').forEach(function(c){c.addEventListener('click',function(){this.classList.toggle('acp');});});
 
-/* --- Step 1 → Step 2 --- */
+/* ── CANDIDATAS FORM ── */
 function goStep2(){
-  var nombre=document.getElementById('f-nombre').value.trim();
-  var tel=document.getElementById('f-tel').value.trim();
-  var email=document.getElementById('f-email').value.trim();
-  var ciudad=document.getElementById('f-ciudad').value.trim();
-  var ok=true;
-  [['f-nombre',nombre],['f-tel',tel],['f-email',email],['f-ciudad',ciudad]].forEach(function(p){
-    var el=document.getElementById(p[0]);
-    if(!p[1]){el.classList.add('error');ok=false;}
+  var nombre = document.getElementById('f-nombre').value.trim();
+  var tel    = document.getElementById('f-tel').value.trim();
+  var email  = document.getElementById('f-email').value.trim();
+  var ciudad = document.getElementById('f-ciudad').value.trim();
+  var ok = true;
+  [['f-nombre',nombre],['f-tel',tel],['f-email',email],['f-ciudad',ciudad]].forEach(function(pair){
+    var el = document.getElementById(pair[0]);
+    if(!pair[1]){el.classList.add('error');ok=false;}
     else{el.classList.remove('error');}
   });
   if(!ok){showToast('Campos incompletos','Por favor completa todos los campos.');return;}
@@ -1036,7 +1003,6 @@ function goStep2(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* --- Step 2 → Step 1 --- */
 function goStep1(){
   document.getElementById('cand-step2').style.display='none';
   document.getElementById('cand-step1').style.display='block';
@@ -1044,29 +1010,26 @@ function goStep1(){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-/* --- Photo upload --- */
-var uploadedPhotos=0;
+var uploadedPhotos = 0;
+
 function triggerUpload(id){document.getElementById(id).click();}
 
-function previewPhoto(input,slotId,prevId){
+function previewPhoto(input, slotId, prevId){
   if(!input.files||!input.files[0])return;
-  var reader=new FileReader();
-  var slot=document.getElementById(slotId);
-  var prev=document.getElementById(prevId);
-  var checkId='check-'+slotId.replace('slot-','');
-  reader.onload=function(e){
-    prev.style.backgroundImage='url('+e.target.result+')';
-    prev.style.backgroundSize='cover';
-    prev.style.backgroundPosition='center';
-    var ic=prev.querySelector('.photo-icon');
-    var po=prev.querySelector('.photo-pose');
-    var ph=prev.querySelector('.photo-hint');
-    if(ic)ic.style.display='none';
-    if(po)po.style.display='none';
-    if(ph)ph.style.display='none';
+  var reader = new FileReader();
+  var slot = document.getElementById(slotId);
+  var prev = document.getElementById(prevId);
+  var checkId = 'check-'+slotId.replace('slot-','');
+  reader.onload = function(e){
+    prev.style.backgroundImage = 'url('+e.target.result+')';
+    prev.style.backgroundSize = 'cover';
+    prev.style.backgroundPosition = 'center';
+    prev.querySelector('.photo-icon').style.display='none';
+    prev.querySelector('.photo-pose').style.display='none';
+    prev.querySelector('.photo-hint').style.display='none';
     slot.classList.add('uploaded');
-    var chk=document.getElementById(checkId);
-    if(chk)chk.style.display='inline';
+    var chk = document.getElementById(checkId);
+    if(chk){chk.style.display='inline';}
     if(!slot.dataset.counted){
       slot.dataset.counted='1';
       uploadedPhotos++;
@@ -1077,99 +1040,67 @@ function previewPhoto(input,slotId,prevId){
 }
 
 function updatePhotoCounter(){
-  document.getElementById('photos-uploaded').textContent=uploadedPhotos;
-  document.getElementById('photos-bar-fill').style.width=(uploadedPhotos*25)+'%';
+  document.getElementById('photos-uploaded').textContent = uploadedPhotos;
+  document.getElementById('photos-bar-fill').style.width = (uploadedPhotos*25)+'%';
 }
 
-/* --- Step 2 → Step 3 (send to Discord) --- */
 async function finalizarCandidatura(){
-  if(uploadedPhotos<4){
-    showToast('Fotos incompletas','Por favor sube las 4 fotografias requeridas.');
-    return;
-  }
+  if(uploadedPhotos<4){showToast('Fotos incompletas','Por favor sube las 4 fotografias requeridas.');return;}
   var btn=document.getElementById('btn-finalizar');
-  btn.textContent='Enviando...';
-  btn.disabled=true;
-
+  btn.textContent='Enviando...';btn.disabled=true;
   var nombre=document.getElementById('f-nombre').value.trim();
   var tel=document.getElementById('f-tel').value.trim();
   var email=document.getElementById('f-email').value.trim();
   var ciudad=document.getElementById('f-ciudad').value.trim();
-
-  var WEBHOOK='https://discord.com/api/webhooks/1484639672012509276/Dx-q6EXTSlLa4gTC7s9eXvSVoWYv7Q4Xp-slhNtMOJEppBNGFq0HwKabike6SznyB7zM';
-
   try{
-    /* 1. Enviar embed con datos de la candidata */
-    var embed={
-      title:'Nueva Postulacion VELOUR',
-      color:7217710,
-      fields:[
-        {name:'Nombre',   value:nombre, inline:true},
-        {name:'Telefono', value:tel,    inline:true},
-        {name:'Correo',   value:email,  inline:false},
-        {name:'Ciudad',   value:ciudad, inline:true}
-      ],
-      footer:{text:'VELOUR - Sistema de postulaciones'},
-      timestamp:new Date().toISOString()
-    };
-    var r1=await fetch(WEBHOOK,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({content:'**Nueva candidata recibida**',embeds:[embed]})
-    });
-    if(!r1.ok){throw new Error('Embed error: '+r1.status);}
-
-    /* 2. Enviar cada foto como mensaje separado (evita DataCloneError) */
     var poses=['frente','lado','gluteos','bustos'];
-    var names=['01_Frente','02_Lateral','03_Gluteos','04_Bustos'];
-    var safe=nombre.replace(/[^a-zA-Z0-9]/g,'_');
-
+    var fotos=[];
     for(var i=0;i<poses.length;i++){
       var inp=document.getElementById('upload-'+poses[i]);
       if(!inp||!inp.files||!inp.files[0])continue;
-
-      /* Leer archivo como ArrayBuffer para evitar DataCloneError */
       var file=inp.files[0];
-      var ext=file.name.split('.').pop()||'jpg';
-      var fname=names[i]+'_'+safe+'.'+ext;
-      var buf=await file.arrayBuffer();
-      var blob=new Blob([buf],{type:file.type||'image/jpeg'});
-
-      var fd=new FormData();
-      fd.append('payload_json',JSON.stringify({content:'**'+names[i].replace('_',' ')+'** — '+nombre}));
-      fd.append('file',blob,fname);
-
-      var rx=await fetch(WEBHOOK,{method:'POST',body:fd});
-      if(!rx.ok){
-        var et=await rx.text();
-        console.warn('Foto '+i+' error:',rx.status,et);
-      }
+      var b64=await toBase64(file);
+      fotos.push({pose:poses[i],ext:file.name.split('.').pop()||'jpg',tipo:file.type||'image/jpeg',data:b64});
     }
-
-    /* 3. Mostrar pantalla de gracias */
-    document.getElementById('cand-step2').style.display='none';
-    document.getElementById('cand-step3').style.display='block';
-    window.scrollTo({top:0,behavior:'smooth'});
-
+    var res=await fetch('/.netlify/functions/postular',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({nombre:nombre,tel:tel,email:email,ciudad:ciudad,fotos:fotos})
+    });
+    if(res.ok){
+      document.getElementById('cand-step2').style.display='none';
+      document.getElementById('cand-step3').style.display='block';
+      window.scrollTo({top:0,behavior:'smooth'});
+    }else{
+      var et=await res.text();console.error('Error:',res.status,et);
+      showToast('Error al enviar','Codigo '+res.status+'. Intentalo de nuevo.');
+      btn.textContent='Finalizar candidatura';btn.disabled=false;
+    }
   }catch(e){
-    console.error('Error:',e);
-    showToast('Error al enviar','Verifica tu conexion e intentalo de nuevo.');
-    btn.textContent='Finalizar candidatura';
-    btn.disabled=false;
+    console.error(e);
+    showToast('Sin conexion','Verifica tu internet e intentalo de nuevo.');
+    btn.textContent='Finalizar candidatura';btn.disabled=false;
   }
 }
 
-/* --- Reset form steps (no navigation) --- */
+function toBase64(file){
+  return new Promise(function(resolve,reject){
+    var r=new FileReader();
+    r.onload=function(e){resolve(e.target.result.split(',')[1]);};
+    r.onerror=reject;
+    r.readAsDataURL(file);
+  });
+}
+
 function resetSteps(){
   document.getElementById('cand-step3').style.display='none';
   document.getElementById('cand-step2').style.display='none';
   document.getElementById('cand-step1').style.display='block';
   document.getElementById('testimonios-section').style.display='block';
-  var fn=document.getElementById('f-nombre');
-  var ft=document.getElementById('f-tel');
-  var fe=document.getElementById('f-email');
-  var fc=document.getElementById('f-ciudad');
-  if(fn)fn.value='';if(ft)ft.value='';if(fe)fe.value='';if(fc)fc.value='';
+  document.getElementById('f-nombre').value='';
+  document.getElementById('f-tel').value='';
+  document.getElementById('f-email').value='';
+  document.getElementById('f-ciudad').value='';
   uploadedPhotos=0;
   updatePhotoCounter();
   ['frente','lado','gluteos','bustos'].forEach(function(pose){
@@ -1179,12 +1110,9 @@ function resetSteps(){
     if(slot){slot.classList.remove('uploaded');delete slot.dataset.counted;}
     if(prev){
       prev.style.backgroundImage='';
-      var ic=prev.querySelector('.photo-icon');
-      var po=prev.querySelector('.photo-pose');
-      var ph=prev.querySelector('.photo-hint');
-      if(ic)ic.style.display='';
-      if(po)po.style.display='';
-      if(ph)ph.style.display='';
+      prev.querySelector('.photo-icon').style.display='';
+      prev.querySelector('.photo-pose').style.display='';
+      prev.querySelector('.photo-hint').style.display='';
     }
     if(chk)chk.style.display='none';
   });
